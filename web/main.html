@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+    <head>  
+
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.js"></script>
+
+        <title>AngularJS $http Rest example</title>  
+        <script type="text/javascript">
+            var app = angular.module("CountryManagement", []);
+            //Controller Part
+            app.controller("CountryController", function ($scope, $http) {
+            $scope.entries = [];
+            $scope.entryForm = {
+            id: - 1,
+                    type: 'debit',
+                    des: "",
+                    amount: 0.00,
+                    date:"",
+                    myVar: true,
+                    name: 'Md. Nazrul Islam',
+                    startingBalace: 100.00,
+                    runningBalance: 73.34
+            };
+//                $scope.transaction = _clearFormData();
+//                $scope.account = cleanAccount();
+
+//                $scope.transactionList = entries;
+
+            $scope.saveTransaction = function() {
+            var amount = parseFloat($scope.entryForm.amount);
+            var num = parseFloat($scope.entryForm.runningBalance);
+            var answer = 0;
+            if ($scope.entryForm.type === 'credit') {
+            answer = num + amount
+            } else {
+            answer = num - amount
+            }
+            $scope.entryForm.runningBalance = answer;
+            $scope.entryForm.amount = amount;
+//                    transactions.push($scope.transaction);
+//                    $scope.transaction = _clearFormData();
+            };
+            _refreshEntryData();
+            //Now load the data from server
+
+            //HTTP POST/PUT methods for add/edit country 
+            // with the help of id, we are going to find out whether it is put or post operation
+            $scope.submitEntry = function () {
+            var method = "";
+            var url = "";
+            if ($scope.entryForm.id == - 1) {
+            //Id is absent in form data, it is create new country operation
+            method = "POST";
+            url = 'rest/account';
+            } else {
+            //Id is present in form data, it is edit country operation
+            method = "PUT";
+            url = 'rest/account';
+            }
+            $http({
+            method: method,
+                    url: url,
+                    data: angular.toJson($scope.entryForm),
+                    headers: {
+                    'Content-Type': 'application/json'
+                    }
+            }).then(_success, _error);
+            };
+            //HTTP DELETE- delete country by Id
+            $scope.deleteEntry = function (x) {
+            $http({
+            method: 'DELETE',
+                    url: 'rest/account/' + x.id
+            }).then(_success, _error);
+            };
+            // In case of edit, populate form fields and assign form.id with country id
+            $scope.editEntry = function (x) {
+
+            $scope.entryForm.type = x.type;
+            $scope.entryForm.des = x.des;
+            $scope.entryForm.amount = x.amount;
+            $scope.entryForm.date = x.date;
+            $scope.entryForm.id = x.id;
+            };
+            /* Private Methods */
+            //HTTP GET- get all countries collection
+            function _refreshEntryData() {
+            $http({
+            method: 'GET',
+                    url: 'rest/account'
+            }).then(function successCallback(response) {
+            $scope.entries = response.data;
+            }, function errorCallback(response) {
+            console.log(response.statusText);
+            });
+            }
+
+
+            function _success(response) {
+            _refreshEntryData();
+            _clearFormData()
+            }
+
+            function _error(response) {
+            console.log(response.statusText);
+            }
+
+
+            //Clear the form
+            function _clearFormData() {
+            $scope.entryForm.id = - 1;
+            $scope.entryForm.type = "debit";
+            $scope.entryForm.des = "";
+            $scope.entryForm.amount = 0.00;
+            $scope.entryForm.date = "";
+            };
+            });
+        </script>
+        <style>
+            /*            .blue-button{
+                            background: #25A6E1;
+                            filter: progid DXImageTransform.Microsoft.gradient( startColorstr='#25A6E1',endColorstr='#188BC0',GradientType=0);
+                            padding:3px 5px;
+                            color:#fff;
+                            font-family:'Helvetica Neue',sans-serif;
+                            font-size:12px;
+                            border-radius:2px;
+                            -moz-border-radius:2px;
+                            -webkit-border-radius:4px;
+                            border:1px solid #1A87B9
+                        }     
+            
+                        .red-button{
+                            background: #CD5C5C;
+            
+                            padding:3px 5px;
+                            color:#fff;
+                            font-family:'Helvetica Neue',sans-serif;
+                            font-size:12px;
+                            border-radius:2px;
+                            -moz-border-radius:2px;
+                            -webkit-border-radius:4px;
+                            border:1px solid #CD5C5C
+                        }      
+            
+                        table {
+                            font-family: "Helvetica Neue", Helvetica, sans-serif;
+                            width: 50%;
+                        }
+            
+                        caption {
+                            text-align: left;
+                            color: silver;
+                            font-weight: bold;
+                            text-transform: uppercase;
+                            padding: 5px;
+                        }
+            
+                        th {
+                            background: SteelBlue;
+                            color: white;
+                        }
+            
+            
+                        tbody tr:nth-child(even) {
+                            background: WhiteSmoke;
+                        }
+            
+                        tbody tr td:nth-child(2) {
+                            text-align:center;
+                        }
+            
+                        tbody tr td:nth-child(3),
+                        tbody tr td:nth-child(4) {
+                            text-align: center;
+                            font-family: monospace;
+                        }
+            
+                        tfoot {
+                            background: SeaGreen;
+                            color: white;
+                            text-align: right;
+                        }
+            
+                        tfoot tr th:last-child {
+                            font-family: monospace;
+                        }
+            
+                        td,th{
+                            border: 1px solid gray;
+                            width: 25%;
+                            text-align: left;
+                            padding: 5px 10px;
+                        }*/
+        </style>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    </head>
+    <body ng-app="CountryManagement" ng-controller="CountryController">
+        <div class="container">
+
+            <h1 class="firstWord">Creative<span class="secondWord">Banking</span></h1>
+            <hr />
+
+            <h4 >Hello {{entryForm.name}} your balance is: {{entryForm.runningBalance| currency}}{{entryForm.startingBalace}}</h4>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Make a transaction</h3>
+                        </div>
+                        <div class="panel-body">
+                            <form ng-submit="submitEntry()">
+                                <table class="table table-responsive table-bordered">
+                                    <!--                <tr>
+                            <td>Type</td>
+                            <td><input type="text" ng-model="entryForm.id" class="form-control"/></td>
+                        </tr>-->
+                                    <tr>
+                                        <td>Type</td>
+                                        <td>
+                                            <select ng-model="entryForm.type" class="form-control">
+                                                
+
+                                                <option value="debit">Debit</option>
+
+                                                <option value="credit">Credit</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Description</td>
+                                        <td><input type="text" ng-model="entryForm.des"  class="form-control"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Amount</td>
+                                        <td><input type="text" ng-model="entryForm.amount"  class="form-control"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Date</td>
+                                        <td><input type="date"  ng-model="entryForm.date"  class="form-control"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td> <button class="btn btn-primary" ng-click="saveTransaction()">Save</button></td>
+                                        <td colspan="2"><input type="submit" value="Submit" class="btn-primary" /></td>
+
+                                    </tr>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                    Show Transaction: <input type="checkbox" ng-model="countryForm.myVar" />
+                    <div ng-show="countryForm.myVar">
+                        <p>Search Transaction: <input type="text" ng-model="test" class="form-control" /></p>
+                        <hr />
+        <p>
+          <strong>Sort Transactions by:</strong>
+          <select ng-model="transType">
+            <option value=''>All</option>
+            <option value='credit'>Credit</option>
+            <option value='debit'>Debit</option>
+          </select>
+        </p>
+                        <table class="table table-striped table-bordered table-condensed">
+                            <tr>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                            <tr ng-repeat="x in entries| filter:test | orderBy:'id'">
+                                <td> {{ x.type}}</td>
+                                <td >{{ x.des}}</td>
+                                <td >{{ x.amount}}</td>
+                                <td >{{ x.date}}</td>
+                                <td><a ng-click="editEntry(x)" class="btn btn-info">Edit</a> | <a ng-click="deleteEntry(x)" class="btn btn-danger">Delete</a></td>
+                            </tr>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>
